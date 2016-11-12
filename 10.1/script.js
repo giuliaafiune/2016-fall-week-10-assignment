@@ -14,11 +14,26 @@ var plot = d3.select('.canvas')
 //Mapping specific functions
 //Projection
 
+var projection = d3.geoAlbers();
+
 //Geopath
+
+var path = d3.geoPath().projection(projection);
 
 d3.json('../data/world-50m.json',dataloaded);
 
 function dataloaded(err, data){
     console.log(data); //This is a Topojson data
-    console.log(topojson.feature(data,data.objects.countries)); //This is the converted GeoJSON data of countries
+    var countryData = topojson.feature(data,data.objects.countries); //This is the converted GeoJSON data of countries
+
+    projection.fitExtent([[0,0],[w,h]], countryData);
+
+	var countries = plot.selectAll(".country")
+    	.data(countryData.features)
+    	.enter()
+    	.append("path").attr("class","country")
+    	.attr("d", path)
+    	.style("fill","red");
+
+
 }
